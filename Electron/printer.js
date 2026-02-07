@@ -111,13 +111,24 @@ const PRINTER_NAME = 'XP-80C';
     }
     }
 
-    function generateReceiptText(receiptData) {
-          const LINE_WIDTH = 32;
+        function generateReceiptText(receiptData) {
+            const THICK_SEPARATOR = '=================================';
+            const THIN_SEPARATOR = '------------------------------------------';
+            const LINE_WIDTH = THICK_SEPARATOR.length;
 
         // Helper function to center text
         function centerText(text) {
             const padding = Math.floor((LINE_WIDTH - text.length) / 2);
-            return ' '.repeat(padding) + text + '\n';
+            return ' '.repeat(Math.max(0, padding)) + text + '\n';
+        }
+
+        function rightAlignLabelValue(label, value) {
+            const left = label + ' ';
+            const spaces = LINE_WIDTH - left.length - value.length;
+            if (spaces <= 0) {
+                return left + value + '\n';
+            }
+            return left + ' '.repeat(spaces) + value + '\n';
         }
 
         // Plain text, no formatting
@@ -128,12 +139,12 @@ const PRINTER_NAME = 'XP-80C';
         receipt += centerText('Wellawaya Road,');
         receipt += centerText('Monaragala, Sri Lanka');
         receipt += centerText('Tel: +94 77 818 1630');
-        receipt += '==========================================\n';
+        receipt += THICK_SEPARATOR + '\n';
         receipt += '\n';
 
         receipt += 'Invoice No: ' + (receiptData.receipt_no || 'N/A') + '\n';
         receipt += 'Date: ' + (receiptData.date || new Date().toLocaleString()) + '\n';
-        receipt += '------------------------------------------\n';
+        receipt += THIN_SEPARATOR + '\n';
         receipt += '\n';
 
         receipt += 'Customer: ' + receiptData.customer_name + '\n';
@@ -142,7 +153,7 @@ const PRINTER_NAME = 'XP-80C';
         // Handle items array from your data structure
         if (Array.isArray(receiptData.items) && receiptData.items.length > 0) {
             receipt += 'ITEMS RENTED:\n';
-            receipt += '------------------------------------------\n';
+            receipt += THIN_SEPARATOR + '\n';
 
             receiptData.items.forEach((item, index) => {
                 receipt += 'Item ' + (index + 1) + ':\n';
@@ -175,16 +186,16 @@ const PRINTER_NAME = 'XP-80C';
         receipt += 'To:   ' + receiptData.return_date + '\n';
         receipt += '\n';
 
-        receipt += '------------------------------------------\n';
-        receipt += 'Payment Received: Rs. ' + parseFloat(receiptData.payment_received).toFixed(2) + '\n';
-        receipt += 'Remaining Payment: Rs. ' + parseFloat(receiptData.remaining_payment).toFixed(2) + '\n';
-        receipt += 'Total Amount: Rs. ' + parseFloat(receiptData.rent_amount).toFixed(2) + '\n';
-        receipt += '------------------------------------------\n';
+        receipt += THIN_SEPARATOR + '\n';
+        receipt += rightAlignLabelValue('Payment Received:', 'Rs. ' + parseFloat(receiptData.payment_received).toFixed(2));
+        receipt += rightAlignLabelValue('Remaining Payment:', 'Rs. ' + parseFloat(receiptData.remaining_payment).toFixed(2));
+        receipt += rightAlignLabelValue('Total Amount:', 'Rs. ' + parseFloat(receiptData.rent_amount).toFixed(2));
+        receipt += THIN_SEPARATOR + '\n';
         receipt += '\n';
 
         receipt += 'Thank you for your business!\n';
         receipt += 'Please return items on time\n';
-        receipt += '==========================================\n';
+        receipt += THICK_SEPARATOR + '\n';
         receipt += '\n';
 
         receipt += 'Powered by Anuruddha Bandara\n';

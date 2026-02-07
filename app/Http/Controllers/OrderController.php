@@ -509,15 +509,13 @@ class OrderController extends Controller
         ];
 
         foreach ($orderItems as $item) {
-            foreach ($types as $relation => $type) {
-                if ($item->$relation) {
-                    $data[] = [
-                        'order_item_id' => $item->id,
-                        'type'          => $type,
-                        'coat_no'       => $item->$relation->coat_no,
-                    ];
-                }
-            }
+            $data[] = [
+                    'coat' => $item->coat ? Item::find($item->coat)->coat_no : null,
+                    'trouser' => $item->trouser ? Item::find($item->trouser)->coat_no : null,
+                    'west' => $item->west ? Item::find($item->west)->coat_no : null,
+                    'national' => $item->national ? Item::find($item->national)->coat_no : null,
+                    'price' => $item->rent_or_sale_price,
+                ];
         }
         return view('pages.order.edit-order', compact('statusList', 'orderDetails', 'orderItems','customerName','rentTotal','data'));
     }
