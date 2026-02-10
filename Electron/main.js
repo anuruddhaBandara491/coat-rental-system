@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const http = require('http');
 const { spawn } = require('child_process');
 const printer = require('./printer');
 
@@ -9,12 +10,31 @@ let phpServer;
 // Start Laravel development server
 function startLaravelServer() {
   return new Promise((resolve, reject) => {
-    // Adjust path to your Laravel installation
-    const laravelPath = path.join(__dirname, '..');
+    const laravelPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'laravel')
+      : path.join(__dirname, '..');
+    const phpBinary = process.env.PHP_PATH || 'php';
+    let settled = false;
 
-    phpServer = spawn('php', ['artisan', 'serve', '--host=127.0.0.1', '--port=8000'], {
+    phpServer = spawn(phpBinary, ['artisan', 'serve', '--host=127.0.0.1', '--port=8000'], {
       cwd: laravelPath,
       stdio: 'pipe'
+    });
+
+    phpServer.on('error', (error) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      reject(error);
+    });
+
+    phpServer.on('close', (code) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      reject(new Error(`Laravel server exited with code ${code}`));
     });
 
     phpServer.stdout.on('data', (data) => {
@@ -28,8 +48,46 @@ function startLaravelServer() {
       console.error(`Laravel Error: ${data}`);
     });
 
-    // Wait 3 seconds for server to start
-    setTimeout(resolve, 3000);
+    waitForServer('http://127.0.0.1:8000', 20000, 500)
+      .then(() => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        resolve();
+      })
+      .catch((error) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        reject(error);
+      });
+  });
+}
+
+function waitForServer(url, timeoutMs, intervalMs) {
+  const startTime = Date.now();
+
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= timeoutMs) {
+        reject(new Error('Laravel server did not respond in time'));
+        return;
+      }
+
+      const request = http.get(url, (response) => {
+        response.resume();
+        resolve();
+      });
+
+      request.on('error', () => {
+        setTimeout(check, intervalMs);
+      });
+    };
+
+    check();
   });
 }
 
@@ -86,6 +144,7 @@ app.on('ready', async () => {
     createWindow();
   } catch (error) {
     console.error('Failed to start:', error);
+    console.error('Tip: ensure PHP is installed and available in PATH, or set PHP_PATH env var.');
     app.quit();
   }
 });

@@ -1,5 +1,5 @@
 {
-  "name": "laravel-pos-electron",
+  "name": "sanajaya-tailor",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -15,11 +15,24 @@
     "electron-builder": "^24.9.1"
   },
   "build": {
-    "appId": "com.yourcompany.pos",
-    "productName": "POS System",
+    "appId": "com.yourcompany.sanajaya-tailor",
+    "productName": "Sanajaya Tailor",
     "directories": {
       "output": "dist"
     },
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "laravel",
+        "filter": [
+          "**/*",
+          "!Electron/**",
+          "!node_modules/**",
+          "!.git/**",
+          "!storage/logs/**"
+        ]
+      }
+    ],
     "win": {
       "target": [
         "nsis"
