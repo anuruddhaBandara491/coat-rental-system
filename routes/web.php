@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/receipt/{id}', 'printOrder')->name('receipt');
         Route::delete('delete-order-item/{id}', 'deleteOrderItem')->name('delete-item'); // New route
         Route::post('add-orders', 'addOrderItem')->name('add-orders');
-
+        Route::post('/update-dryclean', 'updateDryclean')->name('update-dryclean');
     });
     Route::controller(\App\Http\Controllers\ItemController::class)->prefix('item/')->name('item.')->group(function () {
         Route::get('/', 'index')->name('index');

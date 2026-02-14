@@ -309,9 +309,9 @@ function generateReceiptText(receiptData) {
     receipt += '\n';
 
     receipt += THIN_SEPARATOR + '\n';
+    receipt += rightAlignLabelValue('Total Amount:', 'Rs. ' + parseFloat(receiptData.rent_amount).toFixed(2));
     receipt += rightAlignLabelValue('Payment Received:', 'Rs. ' + parseFloat(receiptData.payment_received).toFixed(2));
     receipt += rightAlignLabelValue('Remaining Payment:', 'Rs. ' + parseFloat(receiptData.remaining_payment).toFixed(2));
-    receipt += rightAlignLabelValue('Total Amount:', 'Rs. ' + parseFloat(receiptData.rent_amount).toFixed(2));
     receipt += THIN_SEPARATOR + '\n';
     receipt += '\n';
 

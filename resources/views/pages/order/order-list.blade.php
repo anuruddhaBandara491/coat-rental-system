@@ -1,5 +1,12 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .dryclean-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+</style>
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="text-uppercase mb-0"><span class="text-muted">Order</span> <span class="mx-2">/</span> All Order</h5>
@@ -16,6 +23,7 @@
                     <th>Customer Details</th>
                     <th>Total Amount</th>
                     <th>Status</th>
+                    <th>Dry Clean</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -42,6 +50,7 @@
                     { data: 'customer_details', name: 'customer_details', orderable: false },
                     { data: 'total_amount', name: 'sub_total' },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'is_dryclean', name: 'is_dryclean', orderable: false, searchable: false },
                     { data: 'action', name: 'action', orderable: false, searchable: false }
                 ],
                 dom: '<"d-flex justify-content-between align-items-center px-2"lfB>rtip',
@@ -59,7 +68,17 @@
             });
         });
     </script>
-
+    <script>
+        $('#order_list').on('change', '.dryclean-checkbox', function () {
+            const id = $(this).data('id');
+            const isDryclean = $(this).is(':checked') ? 1 : 0; // checked = returned (not in dryclean)
+            $.post('/order/update-dryclean', {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                is_dryclean: isDryclean
+            });
+        });
+    </script>
     <!-- Keep your existing deleteOrder and updateStatus scripts -->
     <script>
         function deleteOrder(id) {

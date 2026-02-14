@@ -35,7 +35,7 @@ class OrderController extends Controller
                 'details.wests:id,coat_no',
                 'details.nationals:id,coat_no',
             ])
-            ->select('orders.id', 'orders.status', 'orders.invoice_number', 'orders.customer_id', 'orders.created_at', 'orders.sub_total', 'orders.remaining_payment')
+            ->select('orders.id', 'orders.status', 'orders.is_dryclean', 'orders.invoice_number', 'orders.customer_id', 'orders.created_at', 'orders.sub_total', 'orders.remaining_payment')
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
             ->orderByDesc('orders.created_at');
 
@@ -105,13 +105,17 @@ class OrderController extends Controller
                     }
                     return $html;
                 })
+                ->addColumn('is_dryclean', function ($order) {
+                    $checked = $order->is_dryclean ? 'checked' : '';
+                    return '<input type="checkbox" class="dryclean-checkbox" data-id="' . $order->id . '" ' . $checked . '>';
+                })
                 ->addColumn('status', function ($order) {
                     return view('partials.order-status', ['order' => $order])->render();
                 })
                 ->addColumn('action', function ($order) {
                     return view('partials.order-actions', ['order' => $order])->render();
                 })
-                ->rawColumns(['items', 'customer_details', 'total_amount', 'status', 'action'])
+                ->rawColumns(['items', 'customer_details', 'total_amount', 'is_dryclean', 'status', 'action'])
                 ->make(true);
         }
 
@@ -562,6 +566,14 @@ class OrderController extends Controller
 
         // Print receipt
         $this->receiptPrinter->printReceipt($order);
+
+        return response()->json(['success' => true]);
+    }
+    public function updateDryclean(Request $request)
+    {
+        $order = Order::findOrFail($request->id);
+        $order->is_dryclean = $request->is_dryclean;
+        $order->save();
 
         return response()->json(['success' => true]);
     }
