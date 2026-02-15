@@ -7,8 +7,9 @@
     </style>
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="text-uppercase mb-0"><span class="text-muted">Order</span> <span class="mx-2">/</span> Add
-                Order
+            <h5 class="text-uppercase mb-0">
+                <a href="{{ route('order.index') }}" class="text-muted text-decoration-underline" style="cursor:pointer;">Order</a>
+                <span class="mx-2">/</span> Add Order
             </h5>
         </div>
     </div>

@@ -2,8 +2,9 @@
 @section('content')
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="text-uppercase mb-0"><span class="text-muted">Customer</span> <span class="mx-2">/</span> Add
-                Customer
+            <h5 class="text-uppercase mb-0">
+                <a href="{{ route('customer.index') }}" class="text-muted text-decoration-underline" style="cursor:pointer;">Customer</a>
+                <span class="mx-2">/</span> Add Customer
             </h5>
         </div>
     </div>

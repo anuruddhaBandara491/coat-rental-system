@@ -26,8 +26,9 @@
     </style>
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="text-uppercase mb-0"><span class="text-muted">Order</span> <span class="mx-2">/</span> Edit
-                Order
+            <h5 class="text-uppercase mb-0">
+                <a href="{{ route('order.index') }}" class="text-muted text-decoration-underline" style="cursor:pointer;">Order</a>
+                <span class="mx-2">/</span> Edit Order
             </h5>
         </div>
     </div>
@@ -221,7 +222,7 @@
     </div>
 @endsection
 @push('scripts')
-    
+
     <script>
         const orderId = {{ $orderDetails->id }};
 
@@ -325,7 +326,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    console.log('test', data)
+                    location.reload();
                     let newRow = '';
                     newRow += `<tr class="new-item new-table-row">
                                 <td><button class="btn btn-danger btn-sm delete-existing-item" data-type="temp" data-id="${data.id}"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
